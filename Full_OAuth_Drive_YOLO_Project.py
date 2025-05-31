@@ -6,7 +6,7 @@ from PIL import Image
 import io
 
 st.set_page_config(page_title="🌴 油棕樹辨識系統")
-st.title("🌴 油棕樹辨識系統 - Google 雲端登入 + YOLOv8")
+st.title("🌴 油棕樹辨識系統")
 
 CLIENT_SECRETS_FILE = "client_secret.json"
 BACKEND_URL = "http://localhost:8000"
