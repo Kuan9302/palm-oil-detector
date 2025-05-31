@@ -8,9 +8,7 @@ import io
 st.set_page_config(page_title="🌴 油棕樹辨識系統")
 st.title("🌴 油棕樹辨識系統")
 
-CLIENT_SECRETS_FILE = "client_secret.json"
 BACKEND_URL = "http://localhost:8000"
-REDIRECT_URI = "http://localhost:8501/"
 SCOPES = [
     "openid",
     "https://www.googleapis.com/auth/userinfo.email",
@@ -18,13 +16,22 @@ SCOPES = [
     "https://www.googleapis.com/auth/drive.readonly"
 ]
 
-# Google OAuth 流程
+# 使用 secrets 安全載入 OAuth 設定
+client_config = {
+    "web": {
+        "client_id": st.secrets["google_oauth"]["client_id"],
+        "client_secret": st.secrets["google_oauth"]["client_secret"],
+        "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+        "token_uri": "https://oauth2.googleapis.com/token",
+        "redirect_uris": [st.secrets["google_oauth"]["redirect_uri"]]
+    }
+}
+
+flow = Flow.from_client_config(client_config, scopes=SCOPES)
+flow.redirect_uri = st.secrets["google_oauth"]["redirect_uri"]
+
+# Google OAuth 登入流程
 if "token" not in st.session_state:
-    flow = Flow.from_client_secrets_file(
-        CLIENT_SECRETS_FILE,
-        scopes=SCOPES,
-        redirect_uri=REDIRECT_URI
-    )
     query_params = st.query_params
     if "code" in query_params:
         try:
@@ -45,7 +52,7 @@ if "token" not in st.session_state:
         auth_url, _ = flow.authorization_url(prompt="consent", access_type="offline")
         st.markdown(f"[👉 使用 Google 登入]({auth_url})")
 
-# 登出功能與 Token 驗證失效處理
+# 登入後操作
 elif "user" in st.session_state:
     st.success(f"✅ 已登入：{st.session_state['user']['email']}")
     if st.button("🚪 登出"):
@@ -55,18 +62,19 @@ elif "user" in st.session_state:
     token = st.session_state["token"]
     user_email = st.session_state["user"]["email"]
 
-    # 驗證 token 有效性
-    test_resp = requests.get("https://www.googleapis.com/oauth2/v3/userinfo", headers={"Authorization": f"Bearer {token}"})
+    headers = {"Authorization": f"Bearer {token}"}
+
+    # 驗證 token 狀態
+    test_resp = requests.get("https://www.googleapis.com/oauth2/v3/userinfo", headers=headers)
     if test_resp.status_code == 401:
         st.warning("⚠️ 權限失效，請重新登入")
         st.session_state.clear()
         st.rerun()
 
     st.header("☁️ 雲端圖片選擇")
-    headers = {"Authorization": f"Bearer {token}"}
     params = {"q": "mimeType contains 'image/'", "fields": "files(id, name, mimeType, thumbnailLink)", "pageSize": 10}
     drive_resp = requests.get("https://www.googleapis.com/drive/v3/files", headers=headers, params=params)
-    
+
     if drive_resp.status_code == 200:
         files = drive_resp.json().get("files", [])
         for file in files:
@@ -90,8 +98,6 @@ elif "user" in st.session_state:
                             st.error("辨識失敗")
                     else:
                         st.error("無法下載圖片")
-    else:
-        st.warning("⚠️ 無法取得 Google Drive 資料，請確認授權與權限")
 
     st.header("📤 上傳圖片辨識")
     uploaded_file = st.file_uploader("請上傳圖片", type=["jpg", "jpeg", "png"])
