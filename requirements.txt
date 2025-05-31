@@ -1,0 +1,8 @@
+streamlit
+fastapi
+uvicorn
+ultralytics
+google-auth-oauthlib
+requests
+pillow
+google-auth
