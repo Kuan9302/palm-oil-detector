@@ -8,6 +8,7 @@ import io
 st.set_page_config(page_title="🌴 油棕樹辨識系統")
 st.title("🌴 油棕樹辨識系統")
 
+#BACKEND_URL = "http://localhost:8000"
 BACKEND_URL = "https://palm-oil-detector.onrender.com"
 SCOPES = [
     "openid",
