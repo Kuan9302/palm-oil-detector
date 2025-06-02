@@ -27,7 +27,8 @@ client_config = {
     }
 }
 
-flow = Flow.from_client_config(client_config, scopes=SCOPES)
+#flow = Flow.from_client_config(client_config, scopes=SCOPES)
+flow = Flow.from_client_config(..., redirect_uri=st.secrets["google_oauth"]["redirect_uri"])
 flow.redirect_uri = st.secrets["google_oauth"]["redirect_uri"]
 
 # Google OAuth 登入流程
