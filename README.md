@@ -1,1 +1,1 @@
-palm-oil-detector
+# Palm Oil Detector Project - README placeholder
