@@ -4,3 +4,4 @@ uploaded_files/
 __pycache__/
 *.pyc
 .streamlit/secrets.toml
+".streamlit/secrets.toml" 
