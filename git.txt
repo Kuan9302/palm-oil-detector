@@ -4,3 +4,7 @@ git commit -m "Initial commit"
 git branch -M main
 git remote add origin https://github.com/Kuan9302/palm-oil-detector.git
 git push -u origin main
+
+
+git config --global user.name "Kuan9302"
+git config --global user.email "111b15095@mailst.cjcu.edu.tw"
