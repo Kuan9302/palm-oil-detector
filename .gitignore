@@ -1,0 +1,5 @@
+client_secret.json
+results/
+uploaded_files/
+__pycache__/
+*.pyc
