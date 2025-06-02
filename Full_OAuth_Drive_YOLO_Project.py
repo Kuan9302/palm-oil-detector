@@ -1,12 +1,11 @@
-# app.py (Streamlit 前端)
 import streamlit as st
 import requests
 from google_auth_oauthlib.flow import Flow
 from PIL import Image
 import io
 
-st.set_page_config(page_title="🌴 油棕樹辨識系統")
-st.title("🌴 油棕樹辨識系統")
+st.set_page_config(page_title="🌴 油橕樹認證系統")
+st.title("🌴 油橕樹認證系統")
 
 BACKEND_URL = "http://localhost:8000"
 SCOPES = [
@@ -50,7 +49,7 @@ if "token" not in st.session_state:
             st.query_params.clear()
     else:
         auth_url, _ = flow.authorization_url(prompt="consent", access_type="offline")
-        st.markdown(f"[👉 使用 Google 登入]({auth_url})")
+        st.markdown(f"[🖐 使用 Google 登入]({auth_url})")
 
 # 登入後操作
 elif "user" in st.session_state:
@@ -80,7 +79,7 @@ elif "user" in st.session_state:
         for file in files:
             with st.expander(file["name"]):
                 st.image(file.get("thumbnailLink", ""))
-                if st.button(f"🔍 辨識 {file['name']}", key=file['id']):
+                if st.button(f"🔍 認證 {file['name']}", key=file['id']):
                     download_url = f"https://www.googleapis.com/drive/v3/files/{file['id']}?alt=media"
                     image_resp = requests.get(download_url, headers=headers)
                     if image_resp.status_code == 200:
@@ -92,18 +91,18 @@ elif "user" in st.session_state:
                             user_id = user_email.replace("@", "_").replace(".", "_")
                             result_img_url = f"{BACKEND_URL}/results/{user_id}/{data['result_image'].split('/')[-1]}"
                             label_url = f"{BACKEND_URL}/labels/{user_id}/{data['label_file'].split('/')[-1]}"
-                            st.image(Image.open(io.BytesIO(requests.get(result_img_url).content)), caption="辨識結果", use_container_width=True)
+                            st.image(Image.open(io.BytesIO(requests.get(result_img_url).content)), caption="認證結果", use_container_width=True)
                             st.download_button("📄 下載標籤", data=requests.get(label_url).content, file_name="labels.txt")
                         else:
-                            st.error("辨識失敗")
+                            st.error("認證失敗")
                     else:
                         st.error("無法下載圖片")
 
-    st.header("📤 上傳圖片辨識")
+    st.header("📄 上傳圖片認證")
     uploaded_file = st.file_uploader("請上傳圖片", type=["jpg", "jpeg", "png"])
     if uploaded_file:
         st.image(uploaded_file)
-        if st.button("開始辨識"):
+        if st.button("開始認證"):
             files_data = {"file": (uploaded_file.name, uploaded_file.getvalue(), uploaded_file.type)}
             detect = requests.post(f"{BACKEND_URL}/detect", files=files_data, headers={"Authorization": f"Bearer {token}"})
             if detect.status_code == 200:
@@ -111,7 +110,7 @@ elif "user" in st.session_state:
                 user_id = user_email.replace("@", "_").replace(".", "_")
                 result_img_url = f"{BACKEND_URL}/results/{user_id}/{data['result_image'].split('/')[-1]}"
                 label_url = f"{BACKEND_URL}/labels/{user_id}/{data['label_file'].split('/')[-1]}"
-                st.image(Image.open(io.BytesIO(requests.get(result_img_url).content)), caption="辨識結果", use_container_width=True)
+                st.image(Image.open(io.BytesIO(requests.get(result_img_url).content)), caption="認證結果", use_container_width=True)
                 st.download_button("📄 下載標籤", data=requests.get(label_url).content, file_name="labels.txt")
             else:
-                st.error("辨識失敗或未授權")
+                st.error("認證失敗或未授權")
