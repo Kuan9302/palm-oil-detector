@@ -49,7 +49,8 @@ if "token" not in st.session_state:
             st.rerun()
         except Exception as e:
             st.error(f"⚠️ 登入失敗：{e}")
-            st.query_params.clear()
+            st.write(f"錯誤詳細信息: {str(e)}")
+
     else:
         auth_url, _ = flow.authorization_url(prompt="consent", access_type="offline")
         st.markdown(f"[👉 使用 Google 登入]({auth_url})")
