@@ -3,8 +3,7 @@ fastapi
 uvicorn[standard]
 ultralytics
 google-auth-oauthlib
-google-auth
 requests
 pillow
+google-auth
 python-multipart
-
